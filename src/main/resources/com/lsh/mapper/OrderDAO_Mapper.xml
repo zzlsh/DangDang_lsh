@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.dao.OrderDAO">
+	
+	<!-- 展示所有订单 -->
+	<select id="selectAllOrder" resultType="Order">
+		select order_id,order_serial,order_total,order_status,user_id,add_recipients,add_local,order_date
+		from dangdang_order
+	</select>
+	
+	<!-- 根据订单id查询单个订单的全部信息 -->
+	<resultMap id="AllByOrder_id" type="Order">
+		<id property="order_id" column="order_id"/>
+		<result property="order_serial" column="order_serial"/>
+		<result property="order_total" column="order_total"/>
+		<result property="order_status" column="order_status"/>
+		<collection property="orderConnList" ofType="OrderConn">
+			<id property="conn_id" column="conn_id"/>
+			<result property="book_name" column="book_name"/>
+			<result property="book_cover" column="book_cover"/>
+			<result property="conn_original_price" column="conn_original_price"/>
+			<result property="conn_dangdang_price" column="conn_dangdang_price"/>
+			<result property="book_num" column="book_num"/>
+		</collection>
+	</resultMap>
+	<select id="queryOneOrder" resultMap="AllByOrder_id">
+		select d.order_id, d.order_serial, d.order_total, d.order_status, o.book_name, o.book_cover, o.conn_original_price, o.conn_dangdang_price, o.book_num
+		from dangdang_order d
+		join order_book_connection o
+		on d.order_id = o.order_id
+		where d.order_id = #{order_id}
+	</select>
+	
+	<!-- 查询所有用户的方法 -->
+	<select id="selectAllUser" resultType="User">
+		select user_id, user_nickname, user_email, user_status, user_code
+		from dangdang_user
+	</select>
+	
+	<!-- 修改一个用户信息的方法 -->
+	<update id="updateOneUser">
+		update dangdang_user set user_status = #{user_status}
+		where user_id = #{user_id}
+	</update>
+	
+	<!-- 查状态 -->
+	<select id="queryStatus" resultType="User">
+		select user_id, user_status
+		from dangdang_user
+		where user_id = #{user_id}
+	</select>
+</mapper>

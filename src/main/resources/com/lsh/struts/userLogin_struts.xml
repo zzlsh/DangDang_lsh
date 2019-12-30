@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd" >
+<struts>
+	
+	<package name="userLogin" extends="struts-default">
+		<interceptors>
+			<interceptor name="userNeedLogin" class="com.lsh.interceptor.UserLogin"></interceptor>
+			<interceptor-stack name="loginFirst">
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+				<interceptor-ref name="userNeedLogin"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+	</package>
+	
+</struts>

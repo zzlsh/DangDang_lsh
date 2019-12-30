@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd" >
+<struts>
+	
+	<!-- 导入拦截器 -->
+	<include file="com/lsh/struts/adminLogin_struts.xml"></include>
+	<package name="admin" extends="adminLogin" namespace="/admin">
+		<!-- 设置全局跳转 -->
+		<global-results>
+			<result name="adminLogin">/index.jsp</result>
+		</global-results>
+		
+		<!-- 登录方法 -->
+		<action name="adminLoginAction" class="com.lsh.action.AdminAction"
+			method="adminLoginAction">
+			<result name="login_seccess" type="dispatcher">/back/main/main.jsp</result>
+			<result name="login_wrong" type="dispatcher">/back/login.jsp</result>
+		</action>
+
+		<!-- 验证码 -->
+		<action name="getCode" class="com.lsh.action.AdminAction"
+			method="getCode">
+			<!-- 不需要有跳转路径的选择 -->
+		</action>
+
+		<!-- 安全退出方法 -->
+		<action name="safeOut" class="com.lsh.action.AdminAction"
+			method="safeOut">
+			<result name="safe_out" type="redirect">/back/login.jsp</result>
+		</action>
+
+		<!-- 展示所有类别的方法 -->
+		<action name="showAllSortAction" class="com.lsh.action.AdminAction"
+			method="showAllSortAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/category/show.jsp</result>
+		</action>
+
+		<!-- 添加一级标题的方法 -->
+		<action name="addFirstSortAction" class="com.lsh.action.AdminAction"
+			method="addFirstSortAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">showAllSortAction</result>
+			<result name="error" type="dispatcher">/back/category/add-first.jsp</result>
+		</action>
+
+		<!-- 查询所有一级类别的方法 -->
+		<action name="selectAllFirstSort" class="com.lsh.action.AdminAction"
+			method="selectAllFirstSort">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/category/add-second.jsp
+			</result>
+		</action>
+		<!-- 添加二级标题的方法 -->
+		<action name="addSecondSortAction" class="com.lsh.action.AdminAction"
+			method="addSecondSortAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">showAllSortAction</result>
+			<result name="error" type="chain">selectAllFirstSort</result>
+			<!-- 添加失败，带着异常进入另一个方法，所以需要用chain -->
+		</action>
+
+		<!-- 删除一级类别的方法 -->
+		<action name="deleteSortAction" class="com.lsh.action.AdminAction"
+			method="deleteSortAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">showAllSortAction</result>
+		</action>
+		
+		
+		<!-- 书籍管控 -->
+		<!-- 展示所有书籍 -->
+		<action name="selectAllBookAction" class="com.lsh.action.BookAction"
+			method="selectAllBookAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/book/show.jsp</result>
+		</action>
+
+		<!-- 二级类别的名字 -->
+		<action name="allSecondSortNameAction" class="com.lsh.action.BookAction"
+			method="allSecondSortNameAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/book/add.jsp</result>
+		</action>
+		<!-- 添加所有书籍 -->
+		<action name="addBookAction" class="com.lsh.action.BookAction"
+			method="addBookAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">selectAllBookAction</result>
+			<result name="error" type="redirectAction">allSecondSortNameAction</result>
+		</action>
+
+		<!-- 删除一本书的方法 -->
+		<action name="deleteOneBook" class="com.lsh.action.BookAction"
+			method="deleteOneBook">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">selectAllBookAction</result>
+		</action>
+
+		<!-- 修改一本书 -->
+		<action name="updateOneBookAction" class="com.lsh.action.BookAction"
+			method="updateOneBookAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="redirectAction">selectAllBookAction</result>
+			<result name="error" type="redirectAction">selectAllBookAction</result>
+		</action>
+		<!-- 查询一本书 -->
+		<action name="queryOneBook" class="com.lsh.action.BookAction"
+			method="queryOneBook">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/book/update.jsp</result>
+		</action>
+
+		<!-- 根据条件查询书的集合 -->
+		<action name="selectConditionBooksAction" class="com.lsh.action.BookAction"
+			method="selectConditionBooksAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/back/book/show.jsp</result>
+		</action>
+	</package>
+</struts>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd" >
+<struts>
+	
+	<package name="order" extends="struts-default" namespace="/order">
+		<!-- 展示所有订单的方法 -->
+		<action name="selectAllOrderAction" class="com.lsh.action.OrderAction"
+			method="selectAllOrderAction">
+			<result name="success" type="dispatcher">/back/order/show.jsp</result>
+		</action>
+		
+		<!-- 根据订单id查询单个订单详情的方法 -->
+		<action name="queryOneOrderAction" class="com.lsh.action.OrderAction" method="queryOneOrderAction">
+			<result name="success" type="dispatcher">/back/order/detail.jsp</result>
+		</action>
+		
+		<!-- 查询所有用户的方法 -->
+		<action name="selectAllUserAction" class="com.lsh.action.OrderAction" method="selectAllUserAction">
+			<result name="success" type="dispatcher">/back/user/show.jsp</result>
+		</action>
+		
+	</package>
+	
+</struts>

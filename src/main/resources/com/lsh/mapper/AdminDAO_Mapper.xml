@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.dao.AdminDAO">
+
+
+	<!-- 登录方法_根据username查询用户是否存在 -->
+	<select id="login" resultType="Admin">
+		select
+		admin_id,admin_username,admin_password from dangdang_admin where
+		admin_username = #{admin_username}
+	</select>
+
+	<!-- 查询所有类别的方法 -->
+	<resultMap type="Sort" id="allSort">
+		<id property="sort_id" column="own_id" />
+		<result property="sort_name" column="own_name" />
+		<result property="sort_rank" column="own_rank" />
+
+		<association property="father_sort" javaType="Sort">
+			<id property="sort_id" column="father_id" />
+			<result property="sort_name" column="father_name" />
+		</association>
+	</resultMap>
+	<select id="queryAllSort" resultMap="allSort">
+		select d1.sort_id own_id,
+		d1.sort_name own_name, d1.sort_rank own_rank, d2.sort_id father_id,
+		d2.sort_name father_name
+		from dangdang_sort d1
+		left join dangdang_sort d2
+		on d1.father_id = d2.sort_id
+	</select>
+
+	<!-- 添加一级类别 -->
+	<insert id="addFirstSort" parameterType="Sort">
+		insert into
+		dangdang_sort values
+		(#{sort_id},#{sort_name},#{father_id,jdbcType=NULL},#{sort_rank})
+	</insert>
+	<!-- 查询所有一级类别 -->
+	<resultMap type="Sort" id="allFirst">
+		<id property="sort_id" column="sort_id" />
+		<result property="sort_name" column="sort_name" />
+	</resultMap>
+	<select id="selectFirst" resultMap="allFirst">
+		select sort_id, sort_name
+		from dangdang_sort
+		where sort_rank = 1
+	</select>
+
+	<!-- 添加二级类别 -->
+	<insert id="addSecondSort" parameterType="Sort">
+		insert into
+		dangdang_sort values
+		(#{sort_id},#{sort_name},#{father_id},#{sort_rank})
+	</insert>
+	<!-- 查询所有二级类别 -->
+	<select id="selectSecond" resultMap="allSort">
+		select d1.sort_id own_id,
+		d1.sort_name own_name, d1.sort_rank own_rank, d2.sort_id father_id,
+		d2.sort_name father_name
+		from dangdang_sort d1
+		left join dangdang_sort
+		d2
+		on d1.father_id = d2.sort_id
+		where d1.sort_rank = 2
+	</select>
+
+	<!-- 删除一级类别的方法 -->
+	<delete id="deleteFSort" parameterType="Sort">
+		delete from dangdang_sort
+		where sort_id = #{sort_id} or father_id = #{sort_id}
+	</delete>
+
+	<!-- 删除二级类别的方法 -->
+	<delete id="deleteSSort" parameterType="Sort">
+		delete from dangdang_sort
+		where sort_id = #{sort_id}
+	</delete>
+	
+	
+	<!-- 所有一级类别和拥有的二级类别 -->
+	<resultMap type="Sort" id="firstWithSecond">
+		<id property="sort_id" column="fsort_id"/>
+		<result property="sort_name" column="fsort_name"/>
+		<collection property="secondOnFirst" ofType="Sort">
+			<id property="sort_id" column="ssort_id"/>
+			<result property="sort_name" column="ssort_name"/>
+		</collection>
+	</resultMap>
+	<select id="selectFirstAndSecond" resultMap="firstWithSecond">
+		select f.sort_id fsort_id,f.sort_name fsort_name,s.sort_id ssort_id,s.sort_name ssort_name
+		from DANGDANG_SORT f
+		join DANGDANG_SORT s
+		on f.SORT_ID = s.FATHER_ID
+	</select>
+	
+	<!-- 查一个以及分类和其拥有的所有二级分类 -->
+	<select id="oneSortWithAll" resultMap="firstWithSecond">
+		select *
+		from(select f.sort_id fsort_id,f.sort_name fsort_name,s.sort_id ssort_id,s.sort_name ssort_name
+			from dangdang_sort f
+			join dangdang_sort s
+			on f.sort_id = s.father_id)
+		where fsort_id = #{fid}
+	</select>
+	
+	<!-- 根据id查询一个类别 -->
+	<select id="queryOneSort" resultType="Sort">
+		select sort_id, sort_name
+		from dangdang_sort
+		where sort_id = #{sort_id}
+	</select>
+</mapper>

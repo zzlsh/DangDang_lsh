@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.dao.BookDAO">
+
+
+	<!-- 书籍管控 -->
+	<!-- 查询所有书籍的方法 -->
+	<resultMap type="Book" id="allBook">
+		<id property="book_id" column="book_id" />
+		<result property="book_name" column="book_name" />
+		<result property="book_author" column="book_author" />
+		<result property="book_original_price" column="book_original_price" />
+		<result property="book_dangdang_price" column="book_dangdang_price" />
+		<result property="book_publisher" column="book_publisher" />
+		<result property="book_publish_time" column="book_publish_time" />
+		<result property="book_editer_comment" column="book_editer_comment" />
+		<result property="book_cover" column="book_cover" />
+		<result property="book_sales_volume" column="book_sales_volume" />
+		<result property="book_inventory" column="book_inventory" />
+		<result property="book_introduction" column="book_introduction" />
+	</resultMap>
+	<select id="selectAllBook" resultMap="allBook">
+		select book_id,
+		book_name,book_introduction,
+		book_author, book_original_price, book_dangdang_price, book_publisher,
+		book_publish_time, book_cover, book_sales_volume, book_inventory from
+		dangdang_book
+	</select>
+
+	<!-- 添加书籍的方法 -->
+	<insert id="addNewBook" parameterType="Book">
+		insert into
+		dangdang_book
+		values
+		(#{book_id},#{book_name},#{book_author},#{author_introduction},#{book_introduction},#{book_publisher},#{book_publish_time},#{book_printing_time},#{book_putaway_time},#{book_edition},#{book_impression},#{book_paper},#{book_pages},#{book_pack},#{book_format},#{book_words},#{book_isbn},#{book_editer_comment},#{book_media_comment},#{book_catalog},#{book_cover},#{book_original_price},#{book_dangdang_price},#{book_inventory},#{book_sales_volume},#{sort_id})
+	</insert>
+	<!-- 查询所有二级类别的id和名字 -->
+	<resultMap type="Sort" id="secondIdAndName">
+		<id property="sort_id" column="sort_id" />
+		<result property="sort_name" column="sort_name" />
+	</resultMap>
+	<select id="selectAllSecondSort" resultMap="secondIdAndName">
+		select sort_id,
+		sort_name from dangdang_sort where sort_rank = 2
+	</select>
+
+	<!-- 删除一本书的方法 -->
+	<delete id="deleteOneBook" parameterType="Book">
+		delete from dangdang_book where book_id = #{book_id}
+	</delete>
+
+	<!-- 修改一本书的方法 -->
+	<update id="updateOneBook" parameterType="Book">
+		update dangdang_book set book_name=#{book_name},
+		book_author=#{book_author},
+		author_introduction=#{author_introduction},
+		book_introduction=#{book_introduction},
+		book_publisher=#{book_publisher},
+		book_publish_time=#{book_publish_time},
+		book_printing_time=#{book_printing_time},
+		book_edition=#{book_edition},
+		book_impression=#{book_impression},
+		book_paper=#{book_paper},
+		book_pages=#{book_pages},
+		book_pack=#{book_pack},
+		book_format=#{book_format},
+		book_words=#{book_words},
+		book_isbn=#{book_isbn},
+		book_editer_comment=#{book_editer_comment},
+		book_media_comment=#{book_media_comment},
+		book_catalog=#{book_catalog},
+		book_original_price=#{book_original_price},
+		book_dangdang_price=#{book_dangdang_price},
+		book_inventory=#{book_inventory},
+		book_sales_volume=#{book_sales_volume},
+		sort_id=#{sort_id}
+		<if test="book_cover!=null">,book_cover=#{book_cover}</if>
+		where book_id = #{book_id}
+	</update>
+	<!-- 查询一本书 -->
+	<select id="queryOneBook" parameterType="Book" resultType="Book">
+		select book_id,book_name,book_author,author_introduction,book_introduction,book_publisher,book_publish_time,book_printing_time,book_putaway_time,book_edition,book_impression,book_paper,book_pages,book_pack,book_format,book_words,book_isbn,book_editer_comment,book_media_comment,book_catalog,book_cover,book_original_price,book_dangdang_price,book_inventory,book_sales_volume,sort_id
+		from dangdang_book
+		where book_id = #{book_id}
+	</select>
+
+
+	<!-- 模糊查询 -->
+	<select id="selectConditionBooks" resultType="Book">
+		select book_id, book_name,book_author, book_original_price,
+		book_dangdang_price, book_publisher,book_publish_time, book_cover,
+		book_sales_volume, book_inventory
+		from dangdang_book
+		<where>
+			<if test="key=='name'">book_name like '%${words}%'</if><!-- 根据书名 -->
+			<if test="key=='author'">book_author like '%${words}%'</if><!-- 根据作者 -->
+			<if test="key=='press'">book_publisher like '%${words}%'</if><!-- 根据出版社 -->
+		</where>
+	</select>
+
+	<!-- 根据销量倒序排序 -->
+	<select id="maxSaleBooks" resultMap="allBook">
+		SELECT book_id, book_name,book_original_price, book_dangdang_price, book_cover, book_sales_volume
+		from (select ROWNUM r,book_id,
+				book_name, book_original_price, book_dangdang_price,
+				book_cover, book_sales_volume
+				from dangdang_book
+			order by BOOK_SALES_VOLUME DESC)
+		where r BETWEEN 1 and 2
+	</select>
+
+	<!-- 根据上架时间倒叙排序 -->
+	<select id="newBooks" resultMap="allBook">
+		SELECT book_id, book_name,book_original_price, book_dangdang_price, book_cover, book_sales_volume
+		from (select ROWNUM r,book_id,
+				book_name, book_original_price, book_dangdang_price,
+				book_cover, book_sales_volume
+				from dangdang_book
+			order by BOOK_PUTAWAY_TIME DESC)
+		where r BETWEEN 1 and 2
+	</select>
+	
+	<!-- 新书热销榜 -->
+	<select id="hotMaxSaleBooks" resultMap="allBook">
+		select book_id,book_name
+		from(SELECT ROWNUM r, book_id, book_name
+				from (select book_id,book_name,book_sales_volume
+						from dangdang_book
+						order by BOOK_PUTAWAY_TIME DESC)
+				order by book_sales_volume DESC)
+		where r BETWEEN 1 and 8
+	</select>
+	
+	<!-- 根据fid和sid查询特定条件的图书 -->
+	<select id="firstOrSecondSortBooks" resultMap="allBook">
+		select *
+		from (select rownum r, bs.*
+				from (select book_id,book_name,book_introduction,book_author, book_original_price, book_dangdang_price, book_publisher, book_publish_time, book_editer_comment, book_cover, sort_id
+						from dangdang_book
+						<where>
+							<choose>
+								<when test="sid==null||sid==''">
+									sort_id in (select sort_id from dangdang_sort where father_id = #{fid})
+								</when>
+								<otherwise>
+									sort_id = #{sid}
+								</otherwise>
+							</choose>
+						</where>) bs)
+		where r between #{startNum} and #{endNum}
+	</select>
+	
+	<!-- 根据fid和sid查询符合条件的书籍的个数 -->
+	<select id="sortBookSum" resultType="int">
+		select count(*)
+		from dangdang_book
+		<where>
+			<choose>
+				<when test="sid==null||sid==''">
+					sort_id in (select sort_id from dangdang_sort where father_id = #{fid})
+				</when>
+				<otherwise>
+					sort_id = #{sid}
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+	
+</mapper>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd" >
+<struts>
+		
+		
+	<!-- 主界面的包 -->
+	<package name="show" extends="struts-default" namespace="/show">
+		<action name="showMainAction" class="com.lsh.action.FrontAction" method="showMainAction">
+			<result name="success" type="dispatcher">/front/main/main.jsp</result>
+		</action>
+		
+		<!-- 查询一本书 -->
+		<action name="queryOneBook" class="com.lsh.action.FrontAction" method="queryOneBook">
+			<result name="success" type="dispatcher">/front/main/book_detail.jsp</result>
+		</action>
+		
+		<!-- 查询符合展示条件的书籍集合 -->
+		<action name="FirstOrSecondSortBooksAction" class="com.lsh.action.FrontAction" method="FirstOrSecondSortBooksAction">
+			<result name="success" type="dispatcher">/front/main/book_list.jsp</result>
+		</action>
+
+	</package>
+	
+	<!-- 购买 -->
+	<package name="buy" extends="struts-default" namespace="/buy" >
+		<action name="myCartAction" class="com.lsh.action.FrontAction" method="myCartAction">
+			<result name="success" type="dispatcher">/front/cart/cart_list.jsp</result>
+		</action>
+		<action name="changeNumAction" class="com.lsh.action.FrontAction" method="changeNumAction">
+			<result name="success" type="dispatcher">/front/cart/cart_list.jsp</result>
+		</action>
+	</package>
+	
+	
+	
+	<!-- 用户的登陆注册 -->
+	<package name="user" extends="struts-default" namespace="/user">
+		<!-- 注册方法 -->
+		<action name="registAction" class="com.lsh.action.UserAction" method="registAction">
+			<result name="success" type="chain">getActivationAction</result>
+			<result name="error" type="redirect">/front/user/register_form.jsp</result>
+		</action>
+		
+		<!-- 获取激活码的方法 -->
+		<action name="getActivationAction" class="com.lsh.action.UserAction" method="getActivationAction">
+			<result name="success" type="dispatcher">/front/user/verify_form.jsp</result>
+		</action>
+		
+		<!-- 完善信息的方法 -->
+		<action name="activationUser" class="com.lsh.action.UserAction" method="activationUser">
+			<result name="success" type="dispatcher">/front/user/register_ok.jsp</result>
+			<result name="error" type="dispatcher">/front/user/verify_form.jsp</result>
+		</action>
+		
+		
+		<!-- 登录方法 -->
+		<action name="loginAction" class="com.lsh.action.UserAction" method="loginAction">
+			<result name="success" type="chain">
+				<param name="namespace">/show</param>
+				<param name="actionName">showMainAction</param>
+			</result>
+			<result name="error" type="dispatcher">/front/user/login_form.jsp</result>
+		</action>
+		
+		<!-- 获取验证码图片 -->
+		<action name="getCode" class="com.lsh.action.UserAction" method="getCode"></action>
+		
+		<!-- 登出方法 -->
+		<action name="outLoginAction" class="com.lsh.action.UserAction" method="outLoginAction">
+			<result name="success" type="chain">
+				<param name="namespace">/show</param>
+				<param name="actionName">showMainAction</param>
+			</result>
+		</action>
+	</package>
+	
+	
+	<!-- 订单项目 -->
+	<!-- 加入拦截器 -->
+	<include file="com/lsh/struts/userLogin_struts.xml"></include>
+	<package name="frontOrder" extends="userLogin" namespace="/frontOrder">
+		<!-- 对拦截下来的路径进行规定 -->
+		<global-results>
+			<result name="userLogin">/front/user/login_form.jsp</result>
+			<result name="userActive">
+				<param name="namespace">/user</param>
+				<param name="actionName">getActivationAction</param>
+			</result>
+		</global-results>
+		
+		<!-- 根据登录用户查询其所有地址 -->
+		<action name="queryAllAddressByIdAction" class="com.lsh.action.FrontOrderAction" method="queryAllAddressByIdAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/front/order/address_form.jsp</result>
+		</action>
+		
+		<!-- 确定地址，接收信息 -->
+		<action name="placeOrderAction" class="com.lsh.action.FrontOrderAction" method="placeOrderAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="chain">dealOrderAction</result>
+		</action>
+		
+		<!-- 处理订单数据 -->
+		<action name="dealOrderAction" class="com.lsh.action.FrontOrderAction" method="dealOrderAction">
+			<interceptor-ref name="loginFirst"></interceptor-ref>
+			<result name="success" type="dispatcher">/front/order/order_ok.jsp</result>
+		</action>
+	</package>
+	
+</struts>

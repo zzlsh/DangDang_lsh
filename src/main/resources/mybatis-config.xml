@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<properties resource="jdbc.properties"></properties>
+	<settings>
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+	
+	<!-- 给类起别名 -->
+	<typeAliases>
+		<typeAlias type="com.lsh.entity.Admin" alias="Admin"/>
+		<typeAlias type="com.lsh.entity.Sort" alias="Sort"/>
+		<typeAlias type="com.lsh.entity.Book" alias="Book"/>
+		<typeAlias type="com.lsh.entity.Order" alias="Order"/>
+		<typeAlias type="com.lsh.entity.User" alias="User"/>
+		<typeAlias type="com.lsh.entity.Address" alias="Address"/>
+		<typeAlias type="com.lsh.entity.OrderConn" alias="OrderConn"/>
+	</typeAliases>
+	
+	<environments default="oracle">
+		<environment id="oracle">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}"/>
+				<property name="url" value="${url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="com/lsh/mapper/AdminDAO_Mapper.xml"/>
+		<mapper resource="com/lsh/mapper/BookDAO_Mapper.xml"/>
+		<mapper resource="com/lsh/mapper/OrderDAO_Mapper.xml"/>
+		<mapper resource="com/lsh/mapper/UserDAO_Mapper.xml"/>
+		<mapper resource="com/lsh/mapper/FrontOrderDAO_Mapper.xml"/>
+	</mappers>
+</configuration>

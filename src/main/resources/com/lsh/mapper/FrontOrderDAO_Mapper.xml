@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.dao.FrontOrderDAO">
+	
+	<!-- 查询一个用户所有的地址 -->
+	<resultMap type="Address" id="allAddress">
+		<id property="add_id" column="add_id"/>
+		<result property="add_postcode" column="add_postcode"/>
+		<result property="add_local" column="add_local"/>
+		<result property="add_recipients" column="add_recipients"/>
+		<result property="add_tel" column="add_tel"/>
+		<result property="user_id" column="user_id"/>
+	</resultMap>
+	<select id="selectAllAddressById" resultMap="allAddress" parameterType="User">
+		select add_id, add_postcode, add_local, add_recipients, add_tel, user_id
+		from dangdang_address
+		where user_id = #{ user_id }
+	</select>
+	
+	<!-- 根据地址id查询一个地址 -->
+	<select id="queryOneAddress" resultType="Address">
+		select add_id, add_postcode, add_local, add_recipients, add_tel, user_id
+		from dangdang_address
+		where add_id = #{ address }
+	</select>
+	
+	<!-- 添加一个地址 -->
+	<insert id="addNewAddress" parameterType="Address">
+		insert into dangdang_address values (#{add_id}, #{add_postcode}, #{add_local}, #{add_recipients}, #{add_tel}, #{user_id})
+	</insert>
+	
+	<!-- 根据地址id修改一个地址信息 -->
+	<update id="updateOneAddress" parameterType="Address">
+		update dangdang_address set add_postcode = #{ add_postcode }, add_local = #{ add_local }, add_recipients = #{ add_recipients }, add_tel = #{ add_tel }
+		where add_id = #{ add_id }
+	</update>
+	
+	<!-- 订单入库 -->
+	<insert id="addNewOrder" parameterType="Order">
+		insert into dangdang_order values (#{order_id}, #{order_serial}, #{order_total}, #{order_status}, #{user_id}, #{add_recipients}, #{add_local}, #{order_date})
+	</insert>
+	
+	<!-- 关联表入库 -->
+	<insert id="dealConnOrder" parameterType="OrderConn">
+		insert into order_book_connection values(#{conn_id}, #{order_id}, #{book_id}, #{book_name}, #{book_num}, #{conn_original_price}, #{conn_dangdang_price}, #{book_cover}, #{conn_date})
+	</insert>
+	
+	<!-- 修改书籍表的信息 -->
+	<update id="dealOneBook" parameterType="Book">
+		update dangdang_book set book_inventory = #{book_inventory}
+		where book_id = #{book_id}
+	</update>
+</mapper>
